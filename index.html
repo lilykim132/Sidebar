@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sidecar — Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#18181B;--muted:#5B5B63;--line:#E3E1DA;--bg:#F5F4F0;--card:#FFFFFF;--soft:#FAFAF8;--chip:#F0EFEB;
+  --accent:#5B34D6;--accent-dark:#4423B0;--accent-soft:#F1ECFE;--warn-bg:#FFF7F1;--warn-line:#F3D9C6;--warn:#9A3412;--ok:#0B5F58;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.45}
+h1,h2,h3{font-family:"Space Grotesk",Inter,sans-serif;font-weight:600;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--accent)}a:hover{color:var(--accent-dark)}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.row{display:flex;align-items:center;gap:10px}
+.between{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.grow{flex:1}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:5;height:64px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;border:none;background:none;padding:0}
+.brand .mark{width:28px;height:28px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center}
+.brand span{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:16px}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);min-width:0}
+.crumbs button{border:none;background:none;padding:4px 6px;border-radius:6px;color:var(--muted)}
+.crumbs button:hover{background:var(--chip);color:var(--ink)}
+.crumbs .cur{color:var(--ink);font-weight:600}
+
+/* buttons */
+.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 14px;font-size:14px;min-height:40px}
+.btn:hover{background:var(--soft)}
+.btn.primary{border:none;background:var(--accent);color:#fff;font-weight:600}
+.btn.primary:hover{background:var(--accent-dark)}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.sm{min-height:32px;padding:5px 10px;font-size:13px;border-radius:8px}
+.link{border:none;background:none;color:var(--accent);font-weight:600;padding:2px 0;font-size:13px}
+.link:hover{color:var(--accent-dark)}
+.icon-btn{border:none;background:none;padding:4px 6px;border-radius:6px;color:var(--muted);font-size:16px;line-height:1}
+.icon-btn:hover{background:var(--chip);color:var(--ink)}
+
+main{padding:28px 32px 60px;max-width:1440px;margin:0 auto}
+.banner{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.banner.info{border-color:#D9CCFB;background:var(--accent-soft)}
+.banner.warn{border-color:var(--warn-line);background:var(--warn-bg)}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;border-radius:999px;padding:4px 10px;background:var(--chip);border:none;white-space:nowrap}
+.ph-Discover{background:#DDF3EF;color:#0B5F58}
+.ph-Define{background:#FCE7F1;color:#9D174D}
+.ph-Develop{background:#FCEFD9;color:#8A3F06}
+.ph-Deliver{background:#E3ECFD;color:#1E40AF}
+.bar-Discover{background:#2A9D8F}.bar-Define{background:#D6458A}.bar-Develop{background:#D98A1F}.bar-Deliver{background:#3B6FE0}
+select.chip{appearance:none;-webkit-appearance:none;font-weight:600;cursor:pointer;padding-right:10px}
+select.chip.type{font-weight:500;color:var(--ink)}
+
+/* home */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.pcard .desc{font-size:13px;color:var(--muted);margin-top:2px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.steps .s{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.steps .s i{height:4px;border-radius:2px;background:#E3E1DA;display:block}
+.steps .s.done i{background:var(--ink)}.steps .s.done{color:var(--ink)}
+.steps .s.cur i{background:var(--accent)}.steps .s.cur{color:var(--accent-dark);font-weight:600}
+.next{background:var(--soft);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.next .t{font-size:14px;font-weight:600}.next .d{font-size:13px;color:var(--muted)}
+.newcard{border:1.5px dashed #C2BFB6;background:transparent;border-radius:14px;min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--muted);font-size:14px}
+.newcard:hover{border-color:var(--accent);color:var(--accent-dark)}
+.newcard b{font-size:28px;font-weight:400;line-height:1}
+.coverage{display:flex;gap:4px;align-items:center;font-size:11px;color:var(--muted)}
+.coverage span{display:inline-block;width:10px;height:10px;border-radius:3px;background:#E3E1DA}
+.pcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
+.phases{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.phases .bar{height:8px;border-radius:4px;background:#E3E1DA}
+.phases .lbl{font-size:12px;margin-top:6px}
+.ready{font-size:12px;font-weight:600;border-radius:999px;padding:5px 12px;white-space:nowrap}
+.ready.ok{background:#DDF3EF;color:#0B5F58}.ready.almost{background:#FFF4E5;color:#8A3F06}.ready.thin{background:var(--chip);color:#4A4A52}
+.side h2{font-size:18px;margin:0 0 12px}
+.mini{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;gap:12px;margin-bottom:10px}
+.mini .th{width:64px;height:48px;border-radius:6px;background:var(--chip);flex-shrink:0;object-fit:cover;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted)}
+.attn{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:10px}
+.empty{background:var(--card);border:1.5px dashed #C2BFB6;border-radius:14px;padding:32px;text-align:center}
+.empty p{max-width:520px;margin:8px auto 18px}
+
+/* timeline */
+.cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:start}
+@media (max-width:1000px){.cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.colhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ccard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+.ccard.star{border:2px solid var(--accent)}
+.ccard.noteonly{background:var(--soft)}
+.ccard img.shot{width:100%;height:120px;object-fit:cover;object-position:top;border-radius:8px;border:1px solid var(--line);cursor:zoom-in;display:block}
+.ccard .title{font-weight:600;font-size:13px}
+.ccard .note{font-size:13px;white-space:pre-wrap;word-break:break-word}
+.ccard .meta{font-size:11px;color:var(--muted)}
+.noteonly-tag{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+.gapcard{border:1.5px dashed #C2BFB6;border-radius:12px;padding:14px;font-size:12px;color:var(--muted)}
+.gapcard b{color:var(--ink);font-size:13px;display:block;margin-bottom:4px}
+.filters{display:flex;gap:6px}
+.filters button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;font-size:13px}
+.filters button.on{border-color:var(--ink);font-weight:600}
+.confirm{display:flex;gap:6px;align-items:center;font-size:12px}
+
+/* builder */
+.builder{display:grid;grid-template-columns:200px minmax(0,1fr) 300px;gap:24px;align-items:start}
+@media (max-width:1100px){.builder{grid-template-columns:minmax(0,1fr)}.builder nav,.builder aside{position:static!important}}
+.builder nav,.builder aside{position:sticky;top:88px}
+.secnav a{display:flex;justify-content:space-between;text-decoration:none;color:var(--ink);padding:8px;border-radius:8px;font-size:14px}
+.secnav a:hover{background:var(--chip)}
+.secnav .st{font-size:11px}
+.st.st-ok{color:var(--ok)}.st.st-thin{color:var(--warn)}
+.seg{display:flex;background:var(--chip);border-radius:10px;padding:4px}
+.seg button{border:none;background:transparent;border-radius:7px;padding:7px 14px;font-size:13px;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--ink);font-weight:600}
+.metaRow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:22px}
+.metaRow .k{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em}
+.section{margin-bottom:30px;scroll-margin-top:90px}
+.section>h2{font-size:26px;margin-bottom:12px}
+.block{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;gap:22px;margin-bottom:12px}
+.block .txt{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+.block h3{font-size:19px}
+.block p{margin:0;font-size:15px;line-height:1.6}
+.block img{width:280px;max-height:220px;object-fit:cover;object-position:top;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;flex-shrink:0}
+@media (max-width:700px){.block{flex-direction:column}.block img{width:100%}}
+.block.unsourced{border-color:var(--warn-line)}
+.srcs{display:flex;gap:6px;flex-wrap:wrap}
+.src{border:1px solid #D9CCFB;background:var(--accent-soft);color:var(--accent-dark);font-size:12px;border-radius:999px;padding:3px 10px}
+.thin{border:1.5px dashed #C2BFB6;background:var(--soft);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.qa{display:flex;flex-direction:column;gap:6px}
+.qa input{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff}
+.gap{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.gap b{font-size:13px}
+.gap .d{font-size:12px;color:#4A4A52}
+.gap input{border:1px solid var(--warn-line);border-radius:8px;padding:7px 9px;background:#fff;font-size:13px}
+.deck .block p{font-size:15px}
+.deck .slideNo{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em}
+.progress{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:10px;font-size:15px}.progress .pi{display:flex;align-items:center;gap:10px;color:var(--muted)}.progress .pi.done{color:var(--ink)}.progress .pi b{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;background:var(--chip)}.progress .pi.done b{background:var(--accent);color:#fff}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(24,24,27,.45);display:flex;align-items:center;justify-content:center;z-index:20;padding:20px}
+.modal{background:var(--card);border-radius:16px;width:min(680px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:24px;display:flex;flex-direction:column;gap:16px}
+.drop{border:2px dashed #C2BFB6;border-radius:12px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:16px;background:var(--soft)}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop img{max-width:100%;max-height:260px;border-radius:8px}
+textarea.note{width:100%;min-height:96px;border:1.5px solid #C9C6BE;border-radius:10px;padding:10px 12px;resize:vertical}
+textarea.note:focus,input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:600;font-size:13px}
+.inp{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff}
+.pill{border:1px solid var(--line);background:var(--soft);border-radius:999px;padding:8px 14px;font-size:13px;min-height:40px;display:inline-flex;align-items:center;gap:6px}
+.pill[aria-pressed=true]{background:#FFF1F0;border-color:#E5A8A0;color:#9A1B10}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:30;padding:30px;cursor:zoom-out}
+.lightbox img{max-width:100%;max-height:100%;border-radius:8px}
+.pop{position:fixed;z-index:25;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.15);padding:12px;width:300px;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.pop img{width:100%;border-radius:8px;border:1px solid var(--line)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:10px;padding:10px 16px;font-size:13px;z-index:40}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="row" style="min-width:0">
+    <button class="brand" id="brand" aria-label="Home">
+      <div class="mark"><svg width="18" height="18" viewBox="0 0 100 100" fill="none" aria-hidden="true"><rect x="8" y="20" width="60" height="60" rx="12" stroke="#fff" stroke-width="11"/><rect x="74" y="32" width="20" height="48" rx="8" fill="#fff"/></svg></div>
+      <span>Sidecar</span>
+    </button>
+    <nav class="crumbs" id="crumbs" aria-label="Breadcrumb"></nav>
+  </div>
+  <div class="row">
+    <span id="syncNote" class="small muted"></span>
+  </div>
+</header>
+<div style="background:#17151F;color:#F7F5FB;font-size:13px;padding:8px 24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><span><b style="color:#B9A6F7">Demo mode.</b> Sample project data. Nothing is saved, and Claude's responses are pre-written for this demo.</span><a href="/" style="color:#D4C7FA">← Back to Sidecar</a></div>
+<main id="main" aria-live="polite"></main>
+<div id="layer"></div>
+
+<script src="demo-runtime.js"></script>
+<script>
+(() => {
+"use strict";
+const PHASES = ["Discover","Define","Develop","Deliver"];
+const TYPES = ["Insight","Decision","Iteration","Feedback","Fix","Artifact","Note"];
+const SECTIONS = ["Overview","Problem","Research","Solution","Design decisions","Testing","Reflection"];
+const SECTION_PHASE = {Overview:"Define",Problem:"Discover",Research:"Discover",Solution:"Develop","Design decisions":"Develop",Testing:"Deliver",Reflection:"Deliver"};
+
+const S = {
+  db:null, assets:null, sample:null, dictation:null, imgOK:false,
+  projects:new Map(), captures:new Map(), drafts:new Map(),
+  loaded:{projects:false,captures:false,drafts:false}, storageNote:"",
+  view:{name:"home", projectId:null}, filter:"all",
+  banner:null, busy:null, gen:null, confirmDel:null,
+};
+
+/* ---------- utils ---------- */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const rid = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+const imgUrl = (assetId) => "/_blob/" + encodeURIComponent(assetId);
+const host = (u) => { try { return new URL(u).hostname.replace(/^www\./,""); } catch(_) { return ""; } };
+const fmtDate = (iso) => { try { return new Date(iso).toLocaleDateString(undefined,{month:"short",day:"numeric"}); } catch(_) { return ""; } };
+function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2800); }
+function dataUrlToBlob(dataUrl){
+  const [head, b64] = dataUrl.split(",");
+  const mime = (head.match(/data:([^;]+)/)||[])[1] || "image/jpeg";
+  const bin = atob(b64); const arr = new Uint8Array(bin.length);
+  for (let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return new Blob([arr], {type:mime});
+}
+const projCaptures = (pid) => [...S.captures.values()].filter(c => c.projectId === pid).sort((a,b) => String(a.createdAt).localeCompare(String(b.createdAt)));
+
+/* ---------- storage layer (db, or memory fallback) ---------- */
+async function put(coll, id, data){
+  if (coll==="projects") S.projects.set(id, {...data, id});
+  if (coll==="captures") S.captures.set(id, {...data, id});
+  if (coll==="drafts") S.drafts.set(id, {...data, id});
+  if (S.db) { try { await S.db.collection(coll).doc(id).set(data); } catch(e){ handleDbErr(e); } }
+  render();
+}
+async function patch(coll, id, data){
+  const map = coll==="projects"?S.projects:coll==="captures"?S.captures:S.drafts;
+  const cur = map.get(id); if (!cur) return;
+  const next = {...cur, ...data}; map.set(id, next);
+  render();
+  if (S.db) { try { await S.db.collection(coll).doc(id).update(data); } catch(e){ handleDbErr(e); } }
+}
+async function remove(coll, id){
+  const map = coll==="projects"?S.projects:coll==="captures"?S.captures:S.drafts;
+  map.delete(id); render();
+  if (S.db) { try { await S.db.collection(coll).doc(id).delete(); } catch(e){ handleDbErr(e); } }
+}
+function handleDbErr(e){
+  const code = e && e.code;
+  if (code==="quota_exceeded") toast("Storage is full. Delete some captures and try again.");
+  else if (code==="invalid_argument") toast("You can view this page but not change it.");
+  else toast("Couldn't save that change. Try again.");
+}
+function subscribe(){
+  const timer = setTimeout(() => { if (!S.loaded.captures){ S.storageNote="Still connecting to storage… your captures may not be showing yet."; render(); } }, 10000);
+  const sub = (coll, map, key) => S.db.collection(coll).onSnapshot(snap => {
+    map.clear();
+    for (const d of snap.docs) map.set(d.id, {...d.data(), id:d.id});
+    if (!snap.metadata.fromCache){ S.loaded[key]=true; if (key==="captures"){ clearTimeout(timer); S.storageNote=""; if (!appReady) announceReady(); } }
+    render();
+  }, err => { S.loaded[key]=true; clearTimeout(timer); S.storageNote="Storage stopped responding. Reload the page to reconnect."; render(); });
+  sub("projects", S.projects, "projects");
+  sub("captures", S.captures, "captures");
+  sub("drafts", S.drafts, "drafts");
+}
+
+/* ---------- Claude: tagging ---------- */
+async function getBlob(cap){
+  if (!cap.assetId) return null;
+  try { const r = await fetch(imgUrl(cap.assetId)); if (!r.ok) return null; return await r.blob(); } catch(_) { return null; }
+}
+async function tagCapture(capId, blobHint){
+  const cap = S.captures.get(capId); if (!cap) return;
+  if (!S.sample){ await patch("captures", capId, {tagStatus:"failed"}); return; }
+  await patch("captures", capId, {tagStatus:"tagging"});
+  const proj = S.projects.get(cap.projectId);
+  const blob = blobHint || (S.imgOK ? await getBlob(cap) : null);
+  const prompt =
+`You are filing one capture for a student designer's case-study tool. A capture is a quick note (and maybe a screenshot) saved in the moment while designing.
+
+Project: ${proj ? proj.name : "Untitled"}
+Note written in the moment: "${cap.note || "(no note)"}"
+Page they were on: ${cap.title || "(unknown)"} ${cap.url ? "(" + host(cap.url) + ")" : ""}
+${blob ? "The attached image is a screenshot of what they were looking at." : "There is no screenshot."}
+
+${cap.phaseByYou ? "The designer already filed this under the " + cap.phase + " phase. Keep that phase.\n\n" : ""}Classify it.
+Phases (Double Diamond): Discover = research, user or market insights, exploring the problem. Define = need statements, personas, requirements, framing. Develop = ideation, concepts, sketches, iterations, critique and feedback on concepts. Deliver = prototyping, testing, final polish, outcomes.
+Types: Insight, Decision, Iteration, Feedback, Fix, Artifact, Note.
+
+Reply with only JSON:
+{"phase": "Discover|Define|Develop|Deliver", "type": "one of the types", "title": "3 to 8 word title in the designer's voice", "visual": "one plain sentence describing what the screenshot shows, or empty string if none"}
+Use only what the note and image show. Do not invent details.`;
+  try {
+    const opts = {modelTier:"quick"};
+    if (blob) opts.images = [blob];
+    const r = await S.sample.json(prompt, opts);
+    const phase = cap.phaseByYou && PHASES.includes(cap.phase) ? cap.phase : (PHASES.includes(r && r.phase) ? r.phase : "Develop");
+    const type = TYPES.includes(r && r.type) ? r.type : "Note";
+    await patch("captures", capId, {phase, type, title:String(r && r.title || "").slice(0,80), visual:String(r && r.visual || "").slice(0,300), tagStatus:"done"});
+  } catch(e){
+    await patch("captures", capId, {tagStatus:"failed"});
+    if (e && e.code==="not_granted"){ S.sample=null; toast("Claude isn't allowed on this page, so captures won't be tagged automatically."); }
+    else if (e && e.code==="rate_limited") toast("Claude is busy. Use “Tag with Claude” on the card in a minute.");
+  }
+}
+async function tagMany(ids, blobs){
+  S.busy = {label:"Tagging with Claude", done:0, total:ids.length}; render();
+  for (const id of ids){
+    await tagCapture(id, blobs && blobs.get(id));
+    S.busy.done++; render();
+  }
+  S.busy = null; render();
+}
+
+/* ---------- projects ---------- */
+async function ensureProject(name){
+  const clean = String(name||"").trim() || "Untitled project";
+  for (const p of S.projects.values()) if (p.name.toLowerCase()===clean.toLowerCase()) return p.id;
+  const id = rid("p");
+  await put("projects", id, {name:clean, createdAt:new Date().toISOString()});
+  return id;
+}
+
+/* ---------- captures arriving from the sidebar extension ---------- */
+// The extension's bridge script posts captures into this page; we save them and acknowledge.
+const inbox = {queue:[], running:false};
+function receiveCaptures(list){
+  inbox.queue.push(...list);
+  if (!inbox.running) drainInbox();
+}
+async function drainInbox(){
+  inbox.running = true;
+  const newIds = []; const blobs = new Map(); let noImg = 0;
+  while (inbox.queue.length){
+    const c = inbox.queue.shift();
+    const id = String(c.id||"").replace(/[^A-Za-z0-9_-]/g,"").slice(0,60) || rid("cap");
+    try {
+      if (!S.captures.has(id)){
+        const projectId = await ensureProject(c.project);
+        let assetId = null;
+        if (c.imageDataUrl){
+          if (S.assets){
+            try { const blob = dataUrlToBlob(c.imageDataUrl); const up = await S.assets.upload(blob); assetId = up.id; blobs.set(id, blob); }
+            catch(_) { noImg++; }
+          } else noImg++;
+        }
+        await put("captures", id, {projectId, note:String(c.note||"").slice(0,4000), assetId, url:String(c.url||""), title:String(c.title||"").slice(0,200),
+          starred:!!c.starred, createdAt:c.createdAt||new Date().toISOString(), source:"sidebar", tagStatus:"pending",
+          ...(PHASES.includes(c.phase) ? {phase:c.phase, phaseByYou:true} : {})});
+        newIds.push(id);
+      }
+      window.postMessage({csb:"app", type:"ack", ids:[String(c.id)]}, "*");
+    } catch(_) { /* not acknowledged: the sidebar keeps it and retries later */ }
+  }
+  inbox.running = false;
+  if (!newIds.length) return;
+  const n = newIds.length;
+  let msg = n + " new capture" + (n===1?"":"s") + " from the sidebar";
+  if (noImg) msg += " (" + noImg + " screenshot" + (noImg===1?"":"s") + " couldn't be stored)";
+  S.banner = {kind:"info", text: msg + ". Tagging with Claude…"}; render();
+  await tagMany(newIds, blobs);
+  S.banner = {kind:"info", text: msg + (n===1?" was":" were") + " added and tagged by Claude. Wrong phase or type? Change it on the card."};
+  render();
+}
+let appReady = false;
+function announceReady(){ appReady = true; window.postMessage({csb:"app", type:"ready"}, "*"); sendProjectNames(); }
+let lastNames = "";
+function sendProjectNames(){
+  if (!appReady) return;
+  const names = [...S.projects.values()].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).map(p=>p.name);
+  const key = JSON.stringify(names); if (key===lastNames) return; lastNames = key;
+  window.postMessage({csb:"app", type:"projects", names}, "*");
+}
+window.addEventListener("message", (e) => {
+  if (e.source !== window || !e.data || e.data.csb !== "ext") return;
+  if (e.data.type === "hello" && appReady) announceReady();
+  if (e.data.type === "captures" && Array.isArray(e.data.captures) && appReady) receiveCaptures(e.data.captures.slice(0,20));
+});
+
+/* ---------- example data ---------- */
+async function loadExample(){
+  const pid = await ensureProject("Fit AI (Depop) — example");
+  await patch("projects", pid, {description:"A fit-confidence feature concept for secondhand fashion on Depop", role:"Product designer", timeline:"Sep 2026", scope:"Research, UX, prototyping"});
+  const base = Date.parse("2026-09-02T15:00:00Z");
+  const items = [
+    ["Discover","Insight","Vintage size tags can't be trusted","Buyers can't trust vintage size tags, and sellers rarely answer sizing questions.",false],
+    ["Discover","Insight","No returns raises the stakes","Most listings have no returns, so every purchase feels like a guess.",false],
+    ["Define","Decision","Need statement v2","Need statement: secondhand buyers need a reliable way to know how a garment will fit before buying.",true],
+    ["Define","Artifact","Two personas: Vera and Casey","Personas: Vintage Vera (hunts one-off pieces) and Casual Casey (wants a fast yes/no).",false],
+    ["Develop","Iteration","Four-feature concept","Concept has four parts: private body avatar, fit badges, virtual try-on, plain-language fit breakdown.",false],
+    ["Develop","Feedback","Crit: is try-on necessary?","Professor asked whether try-on is really necessary, and how it would actually work.",true],
+    ["Develop","Decision","Cut try-on from prototype","Cutting try-on from the prototype. Focusing on the avatar scanner and the fit breakdown.",true],
+    ["Deliver","Iteration","Scanner flow prototyped","Scanner flow working end to end in the prototype.",false],
+  ];
+  let i = 0;
+  for (const [phase,type,title,note,starred] of items){
+    const id = rid("ex");
+    await put("captures", id, {projectId:pid, note, assetId:null, url:"", title:"", starred, createdAt:new Date(base + i*86400000*3).toISOString(),
+      source:"example", tagStatus:"done", phase, type, visual:""});
+    i++;
+  }
+  go("timeline", pid);
+}
+
+/* ---------- navigation ---------- */
+function go(name, projectId){
+  S.view = {name, projectId: projectId || null};
+  S.confirmDel = null;
+  window.scrollTo(0,0);
+  render();
+}
+
+/* ---------- readiness ---------- */
+function stats(pid){
+  const caps = projCaptures(pid);
+  const counts = Object.fromEntries(PHASES.map(p=>[p,0]));
+  let visuals=0, untagged=0;
+  for (const c of caps){ if (c.phase && counts[c.phase]!=null) counts[c.phase]++; if (!c.phase || c.tagStatus==="pending" || c.tagStatus==="tagging" || c.tagStatus==="failed") untagged++; if (c.assetId) visuals++; }
+  const empty = PHASES.filter(p=>counts[p]===0);
+  let ready;
+  if (caps.length<4 || empty.length>=2) ready = {cls:"thin", text:"Too thin to draft yet"};
+  else if (empty.length===1) ready = {cls:"almost", text:"Almost ready · " + empty[0] + " is empty"};
+  else ready = {cls:"ok", text:"Ready to draft"};
+  return {caps, counts, visuals, untagged, empty, ready};
+}
+
+/* ---------- render ---------- */
+function render(){
+  renderCrumbs();
+  sendProjectNames();
+  const m = $("#main");
+  const keepScroll = window.scrollY;
+  let html = "";
+  if (S.storageNote) html += `<div class="banner warn"><span>${esc(S.storageNote)}</span></div>`;
+  if (S.banner) html += `<div class="banner ${S.banner.kind}"><span>${esc(S.banner.text)}</span><button class="link" data-act="dismiss">Dismiss</button></div>`;
+  if (S.busy) html += `<div class="banner info"><span><b>${esc(S.busy.label)}…</b> ${S.busy.done} of ${S.busy.total}</span></div>`;
+  if (S.view.name==="home") html += viewHome();
+  else if (S.view.name==="timeline") html += viewTimeline();
+  else if (S.view.name==="builder") html += viewBuilder();
+  m.innerHTML = html;
+  window.scrollTo(0, keepScroll);
+}
+function renderCrumbs(){
+  const c = $("#crumbs"); const p = S.projects.get(S.view.projectId);
+  let h = "";
+  if (S.view.name!=="home" && p){
+    h += `<span aria-hidden="true">/</span><button data-act="nav" data-view="timeline" data-pid="${esc(p.id)}" class="${S.view.name==="timeline"?"cur":""}">${esc(p.name)}</button>`;
+    if (S.view.name==="builder") h += `<span aria-hidden="true">/</span><span class="cur">Case study</span>`;
+  }
+  c.innerHTML = h;
+}
+
+function nextStep(pid){
+  const st = stats(pid); const d = S.drafts.get(pid);
+  const newSince = d ? st.caps.filter(c => String(c.createdAt) > String(d.generatedAt) && c.source!=="gap-answer").length : 0;
+  const gaps = d && d.result && Array.isArray(d.result.gaps) ? d.result.gaps.length : 0;
+  if (!st.caps.length) return {step:0, title:"Start capturing", text:"Open the sidebar on any site, pick this project, and save your first capture. Or add one here.", btn:"+ Add a capture", act:"captureFor"};
+  if (st.untagged) return {step:1, title:`Review ${st.untagged} new capture${st.untagged===1?"":"s"}`, text:"Check how Claude filed them and star the key moments.", btn:"Open timeline", act:"nav", view:"timeline"};
+  if (!d && st.ready.cls==="thin") return {step:0, title:"Keep capturing", text: st.empty.length ? `Nothing in ${st.empty.join(", ")} yet. Capture more before drafting.` : "Add a few more captures before drafting.", btn:"Open timeline", act:"nav", view:"timeline"};
+  if (!d) return {step:2, title:"Draft your case study", text:`You have ${st.caps.length} captures across the phases. Claude can write a first draft now.`, btn:"Draft case study", act:"nav", view:"builder", primary:true};
+  if (newSince) return {step:2, title:`${newSince} new capture${newSince===1?"":"s"} since your last draft`, text:"Regenerate to fold them into the story.", btn:"Update draft", act:"nav", view:"builder", primary:true};
+  if (gaps) return {step:3, title:`Fill ${gaps} gap${gaps===1?"":"s"}`, text:"Answer the gap questions so the story has no holes.", btn:"Open case study", act:"nav", view:"builder", primary:true};
+  return {step:4, title:"Draft is up to date", text:"Copy it into your portfolio or deck.", btn:"Open case study", act:"nav", view:"builder"};
+}
+function viewHome(){
+  const projects = [...S.projects.values()].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
+  if (!projects.length && (S.loaded.projects || !S.db)){
+    return `<div class="empty"><h1>Start your first case study</h1>
+      <p class="muted">Create a project for something you're designing. Then capture screenshots and the reasons behind your decisions as you work. Claude files them by phase and turns them into a case study where every sentence links back to real evidence.</p>
+      <div class="row" style="justify-content:center;flex-wrap:wrap">
+        <button class="btn primary" data-act="newProject">+ New project</button>
+        <button class="btn" data-act="example">See the Fit AI example</button>
+      </div></div>`;
+  }
+  if (!projects.length) return `<p class="muted">Loading your projects…</p>`;
+  const STEP = ["Capture","Review","Draft","Fill gaps"];
+  let cards = "";
+  for (const p of projects){
+    const st = stats(p.id); const n = nextStep(p.id);
+    const steps = STEP.map((s,i)=>`<div class="s ${i<n.step?"done":i===n.step?"cur":""}"><i></i>${s}</div>`).join("");
+    const cov = PHASES.map(ph=>`<span class="${st.counts[ph]?"bar-"+ph:""}" title="${ph}: ${st.counts[ph]}"></span>`).join("");
+    cards += `<article class="pcard">
+      <div class="row between" style="align-items:flex-start"><div style="min-width:0"><h2 style="font-size:20px">${esc(p.name)}</h2>
+        ${p.description?`<div class="desc">${esc(p.description)}</div>`:""}</div>
+        <button class="icon-btn" data-act="editProject" data-pid="${esc(p.id)}" aria-label="Edit project details">⋯</button></div>
+      <div class="steps" aria-label="Progress">${steps}</div>
+      <div class="next"><div><div class="t">${esc(n.title)}</div><div class="d">${esc(n.text)}</div></div>
+        <div class="row wrap"><button class="btn sm ${n.primary?"primary":""}" data-act="${n.act}" data-view="${n.view||""}" data-pid="${esc(p.id)}">${esc(n.btn)}</button>
+        ${n.view!=="timeline"&&st.caps.length?`<button class="link" data-act="nav" data-view="timeline" data-pid="${esc(p.id)}">Timeline</button>`:""}</div></div>
+      <div class="row between"><div class="coverage">${cov}<span style="width:auto;background:none;margin-left:4px">${st.caps.length} capture${st.caps.length===1?"":"s"} · ${st.visuals} with visuals</span></div>
+        ${p.timeline?`<span class="small muted">${esc(p.timeline)}</span>`:""}</div>
+    </article>`;
+  }
+  cards += `<button class="newcard" data-act="newProject"><b>+</b>New project</button>`;
+  return `<div class="row between" style="margin-bottom:18px"><div><h1 style="font-size:30px">Your projects</h1><div class="small muted" style="margin-top:2px">Your process, captured as you go.</div></div>
+    <button class="btn primary" data-act="newProject">+ New project</button></div><div class="pgrid">${cards}</div>`;
+}
+
+/* ---------- project details modal ---------- */
+let pmodal = null;
+function openProjectModal(pid){
+  const p = pid ? S.projects.get(pid) : null;
+  pmodal = {pid: p ? p.id : null, confirmDelete:false};
+  $("#layer").innerHTML = `<div class="scrim" data-act="closeScrim"><form class="modal" role="dialog" aria-modal="true" aria-labelledby="pTitle" id="pForm">
+    <div class="row between"><h2 id="pTitle" style="font-size:22px">${p?"Project details":"New project"}</h2><button type="button" class="icon-btn" data-act="closeModal" aria-label="Close" style="font-size:22px">×</button></div>
+    <p class="small muted" style="margin:0">${p?"These details appear at the top of your case study.":"Set up a project for something you're designing. You'll capture into it as you work, then draft its case study."}</p>
+    <div class="field"><label for="pName">Project name</label><input id="pName" class="inp" required maxlength="80" placeholder="e.g. Fit AI for Depop" value="${esc(p?p.name:"")}"></div>
+    <div class="field"><label for="pDesc">What is it? <span class="muted" style="font-weight:400">(one line)</span></label><input id="pDesc" class="inp" maxlength="200" placeholder="e.g. A fit-confidence feature for secondhand fashion" value="${esc(p&&p.description||"")}"></div>
+    <div class="row wrap" style="align-items:flex-start">
+      <div class="field grow"><label for="pRole">Your role</label><input id="pRole" class="inp" maxlength="80" placeholder="e.g. Product designer" value="${esc(p&&p.role||"")}"></div>
+      <div class="field grow"><label for="pTime">Timeline</label><input id="pTime" class="inp" maxlength="80" placeholder="e.g. Sep–Oct 2026, 4 weeks" value="${esc(p&&p.timeline||"")}"></div>
+    </div>
+    <div class="field"><label for="pScope">Scope</label><input id="pScope" class="inp" maxlength="120" placeholder="e.g. Research, UX, prototyping" value="${esc(p&&p.scope||"")}"></div>
+    <div class="row between wrap">
+      <div>${p?`<span id="pDelWrap"><button type="button" class="link" style="color:var(--warn)" data-act="pDelete">Delete project</button></span>`:""}</div>
+      <div class="row"><button type="button" class="btn" data-act="closeModal">Cancel</button><button type="submit" class="btn primary">${p?"Save":"Create project"}</button></div>
+    </div></form></div>`;
+  $("#pName").focus();
+  $("#pForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = $("#pName").value.trim(); if (!name){ $("#pName").focus(); return; }
+    const data = {name, description:$("#pDesc").value.trim(), role:$("#pRole").value.trim(), timeline:$("#pTime").value.trim(), scope:$("#pScope").value.trim()};
+    const editing = pmodal.pid; closeModal();
+    if (editing) await patch("projects", editing, data);
+    else { const id = rid("p"); await put("projects", id, {...data, createdAt:new Date().toISOString()}); go("timeline", id); toast("Project created. Pick it in the sidebar's project menu to capture into it."); }
+  });
+}
+async function deleteProject(pid){
+  for (const c of projCaptures(pid)) await remove("captures", c.id);
+  if (S.drafts.has(pid)) await remove("drafts", pid);
+  await remove("projects", pid);
+  go("home");
+  toast("Project deleted.");
+}
+
+function capCard(c){
+  const del = S.confirmDel===c.id;
+  const phaseSel = `<select class="chip ph-${esc(c.phase||"")}" data-act="setPhase" data-id="${esc(c.id)}" aria-label="Phase">${PHASES.map(p=>`<option ${p===c.phase?"selected":""}>${p}</option>`).join("")}</select>`;
+  const typeSel = `<select class="chip type" data-act="setType" data-id="${esc(c.id)}" aria-label="Type">${TYPES.map(t=>`<option ${t===c.type?"selected":""}>${t}</option>`).join("")}</select>`;
+  return `<article class="ccard ${c.starred?"star":""} ${c.assetId?"":"noteonly"}">
+    ${c.assetId?`<img class="shot" src="${imgUrl(c.assetId)}" alt="${esc(c.visual||"Screenshot")}" data-act="zoom" data-src="${imgUrl(c.assetId)}">`
+      :`<div class="noteonly-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 9h8M8 13h8"/></svg>Note only</div>`}
+    ${c.title?`<div class="title">${esc(c.title)}</div>`:""}
+    ${c.note?`<div class="note">${esc(c.note)}</div>`:""}
+    <div class="row wrap" style="gap:6px">${c.phase?phaseSel:""}${c.phase&&c.type?typeSel:(c.tagStatus==="tagging"||c.tagStatus==="pending"?`<span class="chip">Tagging…</span>`:`<button class="btn sm" data-act="retag" data-id="${esc(c.id)}">Tag with Claude</button>`)}</div>
+    <div class="row between">
+      <span class="meta">${esc(fmtDate(c.createdAt))}${c.url?" · "+esc(host(c.url)):""}</span>
+      <div class="row" style="gap:2px">
+        ${c.assetId?"":`<label class="link" style="cursor:pointer">+ Add visual<input type="file" accept="image/*" class="hidden" data-act="addVisual" data-id="${esc(c.id)}"></label>`}
+        <button class="icon-btn" data-act="star" data-id="${esc(c.id)}" aria-label="${c.starred?"Unstar":"Star as key moment"}" aria-pressed="${!!c.starred}" style="color:${c.starred?"var(--accent)":""}">${c.starred?"★":"☆"}</button>
+        ${del?`<span class="confirm">Delete? <button class="link" data-act="delYes" data-id="${esc(c.id)}">Yes</button><button class="link" data-act="delNo">No</button></span>`
+          :`<button class="icon-btn" data-act="del" data-id="${esc(c.id)}" aria-label="Delete capture">×</button>`}
+      </div>
+    </div>
+  </article>`;
+}
+
+function viewTimeline(){
+  const p = S.projects.get(S.view.projectId);
+  if (!p) return `<p class="muted">This project isn't available. <button class="link" data-act="home">Back to projects</button></p>`;
+  const st = stats(p.id);
+  let caps = st.caps;
+  if (S.filter==="starred") caps = caps.filter(c=>c.starred);
+  if (S.filter==="notes") caps = caps.filter(c=>!c.assetId);
+  let h = "";
+  h += `<div class="row between wrap" style="margin-bottom:20px"><div><div class="small muted">Timeline</div><h1 style="font-size:30px">${esc(p.name)}</h1></div>
+    <div class="row wrap"><div class="filters" role="group" aria-label="Filter">
+      ${[["all","All"],["starred","Starred"],["notes","Notes only"]].map(([k,l])=>`<button class="${S.filter===k?"on":""}" data-act="filter" data-f="${k}">${l}</button>`).join("")}</div>
+      <button class="btn" data-act="captureHere">+ Capture</button>
+      <button class="btn primary" data-act="nav" data-view="builder" data-pid="${esc(p.id)}">Build case study</button></div></div>`;
+  const untagged = caps.filter(c=>!c.phase);
+  if (untagged.length){
+    h += `<div style="margin-bottom:16px"><div class="colhead"><span class="chip">Not tagged yet · ${untagged.length}</span>
+      ${S.sample?`<button class="link" data-act="retagAll">Tag all with Claude</button>`:""}</div>
+      <div class="cols">${untagged.map(capCard).join("")}</div></div>`;
+  }
+  h += `<div class="cols">`;
+  for (const ph of PHASES){
+    const list = caps.filter(c=>c.phase===ph);
+    h += `<section><div class="colhead"><span class="chip ph-${ph}" style="font-weight:600">${ph}</span><span class="small muted">${list.length} capture${list.length===1?"":"s"}</span></div>
+      ${list.map(capCard).join("")}
+      ${!list.length && S.filter==="all"?`<div class="gapcard"><b>Gap: nothing in ${ph} yet</b>${ph==="Deliver"?"Your case study will need evidence from testing. Capture what users did or said.":"Capture something from this phase, or answer the gap questions when you draft."}</div>`:""}
+    </section>`;
+  }
+  h += `</div>`;
+  if (!st.caps.length) h += `<div class="empty" style="margin-top:16px"><p class="muted">No captures in this project yet. Capture from the sidebar while you work, or right here.</p><button class="btn primary" data-act="captureHere">+ Capture</button></div>`;
+  return h;
+}
+
+/* ---------- builder ---------- */
+function viewBuilder(){
+  const p = S.projects.get(S.view.projectId);
+  if (!p) return `<p class="muted">This project isn't available.</p>`;
+  const st = stats(p.id);
+  const draft = S.drafts.get(p.id);
+  const fmt = (S.gen && S.gen.pid===p.id) ? S.gen.format : (S.view.format || (draft && draft.format) || "portfolio");
+  S.view.format = fmt;
+  let head = `<div class="row between wrap" style="margin-bottom:22px"><div><div class="small muted">Case study draft</div><h1 style="font-size:30px">${esc(p.name)}</h1></div>
+    <div class="row wrap"><div class="seg" role="group" aria-label="Output format">
+      <button class="${fmt==="portfolio"?"on":""}" data-act="fmt" data-f="portfolio">Portfolio</button>
+      <button class="${fmt==="deck"?"on":""}" data-act="fmt" data-f="deck">Class deck</button></div>
+      ${draft?`<button class="btn" data-act="copyHtml" title="Paste into Framer, Webflow, Squarespace, Notion, Cargo or Google Docs">Copy for website</button><button class="btn" data-act="copyMd">Copy as Markdown</button>`:""}
+      ${S.gen?`<button class="btn" data-act="stop">Stop</button>`:`<button class="btn primary" data-act="generate" ${!S.sample||!st.caps.length?"disabled":""}>${draft?"Regenerate":"Generate draft"}</button>`}
+    </div></div>`;
+  if (!S.sample) head += `<div class="banner warn"><span>Claude isn't available on this page right now, so drafts can't be generated. Open it on claude.ai while signed in, and allow Claude when asked.</span></div>`;
+  if (S.gen && S.gen.pid===p.id){
+    return head + `<div class="banner info"><span><b>Claude is drafting from ${st.caps.length} captures…</b> This usually takes 20–60 seconds.</span></div><div class="progress">${progressHtml(S.gen.text)}</div>`;
+  }
+  if (!draft){
+    return head + `<div class="empty"><h2>Turn your captures into a case study</h2>
+      <p class="muted">Claude writes a short, Rachel Chen–style case study from your ${st.caps.length} captures. Every paragraph links to the captures it came from. Where there isn't enough evidence, it asks you questions instead of making things up.</p>
+      ${st.caps.length<4?`<p class="small" style="color:var(--warn)">You only have ${st.caps.length} capture${st.caps.length===1?"":"s"}. The draft will be mostly questions.</p>`:""}
+      <button class="btn primary" data-act="generate" ${!S.sample||!st.caps.length?"disabled":""}>Generate draft</button></div>`;
+  }
+  const r = draft.result || {};
+  const deck = draft.format==="deck";
+  const sections = Array.isArray(r.sections) ? r.sections : [];
+  let nav = `<nav class="secnav" aria-label="Sections"><div class="small muted" style="font-weight:600;letter-spacing:.06em;padding:0 8px 6px">${deck?"SLIDES":"SECTIONS"}</div>`;
+  sections.forEach((s,i)=>{ nav += `<a href="#sec-${i}" data-act="jump" data-i="${i}">${esc(s.name)}<span class="st ${s.status==="thin"?"st-thin":"st-ok"}">${s.status==="thin"?"Needs evidence":"Drafted"}</span></a>`; });
+  nav += `<p class="small muted" style="padding:8px">Generated ${esc(fmtDate(draft.generatedAt))}${draft.format!==fmt?` as a ${deck?"class deck":"portfolio piece"}. Regenerate to switch.`:"."}</p></nav>`;
+  const m = {role:p.role||(r.meta||{}).role, timeline:p.timeline||(r.meta||{}).timeline, scope:p.scope||(r.meta||{}).scope};
+  let body = `<div class="${deck?"deck":""}"><div class="metaRow"><div><div class="k">ROLE</div>${m.role?esc(m.role):`<button class="link" data-act="editProject" data-pid="${esc(p.id)}">Add role</button>`}</div><div><div class="k">TIMELINE</div>${m.timeline?esc(m.timeline):`<button class="link" data-act="editProject" data-pid="${esc(p.id)}">Add dates</button>`}</div><div><div class="k">SCOPE</div>${m.scope?esc(m.scope):`<button class="link" data-act="editProject" data-pid="${esc(p.id)}">Add scope</button>`}</div></div>`;
+  sections.forEach((s,i)=>{
+    body += `<section class="section" id="sec-${i}">${deck?`<div class="slideNo">SLIDE ${i+1}</div>`:""}<h2>${esc(s.heading||s.name)}</h2>`;
+    if (s.status==="thin" || !(s.blocks||[]).length){
+      body += `<div class="thin"><div><b>Not enough to draft ${esc(s.name)} yet.</b> <span class="muted">Answer a question below, or add a capture.</span></div>`;
+      (s.questions||[]).forEach((q,qi)=>{ body += `<div class="qa"><label for="q-${i}-${qi}" style="font-size:13px">${esc(q)}</label><div class="row"><input class="grow" id="q-${i}-${qi}" placeholder="One line is enough"><button class="btn sm" data-act="answer" data-q="${esc(q)}" data-phase="${esc(SECTION_PHASE[s.name]||"Develop")}" data-input="q-${i}-${qi}">Save answer</button></div></div>`; });
+      body += `</div>`;
+    }
+    (s.blocks||[]).forEach(b=>{
+      const srcs = (b.sources||[]).filter(id=>S.captures.has(id));
+      const vis = b.visual && S.captures.get(b.visual) && S.captures.get(b.visual).assetId ? S.captures.get(b.visual).assetId : null;
+      body += `<article class="block ${srcs.length?"":"unsourced"}"><div class="txt">${b.heading?`<h3>${esc(b.heading)}</h3>`:""}
+        ${String(b.text||"").split(/\n+/).filter(Boolean).map(t=>`<p>${deck?"• ":""}${esc(t)}</p>`).join("")}
+        <div class="srcs">${srcs.length?srcs.map(id=>{const c=S.captures.get(id);return `<button class="src" data-act="src" data-id="${esc(id)}">Source: ${esc(c.title||(c.note||"").slice(0,30)||"capture")}</button>`;}).join(""):`<span class="small" style="color:var(--warn)">No capture backs this up. Check it before using it.</span>`}</div></div>
+        ${vis?`<img src="${imgUrl(vis)}" alt="${esc(S.captures.get(b.visual).visual||"Screenshot")}" data-act="zoom" data-src="${imgUrl(vis)}">`:""}</article>`;
+    });
+    body += `</section>`;
+  });
+  body += `</div>`;
+  const gaps = Array.isArray(r.gaps)?r.gaps:[];
+  let aside = `<aside><div class="row" style="gap:8px;margin-bottom:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A3412" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6"/><path d="M12 16.5v.5"/></svg><h2 style="font-size:18px">Gap check</h2></div>
+    <p class="small muted" style="margin:0 0 12px">Places where the story has no capture behind it. Answers become captures. Regenerate to include them.</p>`;
+  if (!gaps.length) aside += `<p class="small muted">No gaps found.</p>`;
+  gaps.forEach((g,gi)=>{
+    aside += `<div class="gap"><b>${esc(g.title)}</b><div class="d">${esc(g.detail)}</div>
+      ${g.question?`<label class="small" for="g-${gi}">${esc(g.question)}</label><input id="g-${gi}" placeholder="Answer in one line"><button class="link" style="align-self:flex-start" data-act="answer" data-q="${esc(g.question)}" data-phase="${esc(g.phase||"Develop")}" data-input="g-${gi}">Save answer</button>`:""}</div>`;
+  });
+  aside += `<p class="small muted" style="border-top:1px solid var(--line);padding-top:12px">Every paragraph links to the captures it came from. Click a source to see it.</p></aside>`;
+  return head + `<div class="builder">${nav}<div>${body}</div>${aside}</div>`;
+}
+
+async function generate(){
+  const pid = S.view.projectId; const p = S.projects.get(pid); if (!p || !S.sample || S.gen) return;
+  const fmt = S.view.format || "portfolio";
+  const caps = projCaptures(pid);
+  const lines = caps.map(c => JSON.stringify({id:c.id, date:String(c.createdAt||"").slice(0,10), phase:c.phase||"untagged", type:c.type||"", title:c.title||"",
+    note:String(c.note||"").slice(0,600), screenshot: c.assetId ? (c.visual || "screenshot attached") : null, keyMoment:!!c.starred})).join("\n");
+  const formatRules = fmt==="deck"
+    ? `FORMAT: a class presentation deck. Each section is one slide. "heading" is the slide title (8 words max). Each block is one bullet of 18 words max; at most 3 blocks per slide. Design decisions may use up to 3 blocks, each with a short "heading".`
+    : `FORMAT: a portfolio case study page. Each block is 1 to 3 short sentences. In "Design decisions", each block is one decision written as insight then decision, with a question-style "heading" where natural (for example "Is try-on actually necessary?").`;
+  const prompt =
+`You are helping a design student turn their in-the-moment process captures into a case study. Write in first person ("I"), confident and concise, short declarative sentences, no hype words. Style reference: short sections, a heading plus one to three sentences, decisions shown as insight to solution with a screen next to them.
+
+${formatRules}
+
+Project: ${p.name}${p.description?"\nWhat it is: "+p.description:""}${p.role?"\nMy role: "+p.role:""}${p.timeline?"\nTimeline: "+p.timeline:""}${p.scope?"\nScope: "+p.scope:""}
+Captures, one JSON object per line (id, date, phase, type, title, note, screenshot description or null, keyMoment):
+${lines}
+
+STRICT RULES
+- Use only facts in the captures. Never invent metrics, user counts, dates, team members, tools, or results.
+- Every block must list the capture ids it relies on in "sources" (at least one, ids exactly as given).
+- "visual": the id of one source capture whose screenshot is not null and best fits the block, otherwise null.
+- Prefer key moments.
+- If a section has no real evidence, set "status": "thin", "blocks": [], and give 1 or 2 specific "questions" that would let you write it. Do not pad.
+- Sections, in this order, each exactly once: ${SECTIONS.join(", ")}.
+- "meta": role, timeline, scope only if the captures state them, otherwise empty strings.
+- "gaps": up to 5 places where the story has no captured reasoning or evidence: a decision with no "why", a feature mentioned but never resolved, a key moment with no screenshot, a phase with nothing captured. Each has a one-line "question" the student can answer, and the "phase" it belongs to.
+
+Reply with only JSON in this shape:
+{"meta":{"role":"","timeline":"","scope":""},"sections":[{"name":"Overview","heading":"","status":"drafted","blocks":[{"heading":"","text":"","sources":["id"],"visual":null}],"questions":[]}],"gaps":[{"title":"","detail":"","question":"","phase":"Develop"}]}`;
+  const ctl = new AbortController();
+  S.gen = {pid, format:fmt, text:"", ctl}; render();
+  try {
+    const result = await S.sample.json(prompt, {signal:ctl.signal, cache:false, onText:({text}) => { if (S.gen){ S.gen.text = text; const el = document.querySelector(".progress"); if (el) el.innerHTML = progressHtml(text); } }});
+    if (!result || !Array.isArray(result.sections)) throw {code:"invalid_json"};
+    S.gen = null;
+    await put("drafts", pid, {format:fmt, generatedAt:new Date().toISOString(), captureCount:caps.length, result});
+  } catch(e){
+    S.gen = null; render();
+    const code = e && e.code;
+    if (code==="cancelled") return;
+    if (code==="not_granted"){ S.sample=null; toast("Claude wasn't allowed, so the draft can't be written."); }
+    else if (code==="rate_limited") toast("Claude is busy or you've hit a usage limit. Try again in a bit.");
+    else if (code==="invalid_json") toast("Claude's answer came back malformed. Try Regenerate.");
+    else if (code==="prompt_too_large") toast("Too many captures to send at once. Try trimming notes.");
+    else toast("Drafting failed. Try again.");
+    render();
+  }
+}
+
+function progressHtml(text){
+  const seen = new Set((String(text||"").match(/"name"\s*:\s*"([^"]+)"/g)||[]).map(m=>m.replace(/.*"([^"]+)"$/,"$1")));
+  const last = [...seen].pop();
+  return `<div class="small muted">${text?"Writing from your captures…":"Reading your captures…"}</div>` + SECTIONS.map(n=>{
+    const done = seen.has(n) && n!==last; const cur = n===last;
+    return `<div class="pi ${done?"done":""}"><b>${done?"✓":cur?"…":""}</b>${esc(n)}${cur?" — writing":""}</div>`;
+  }).join("");
+}
+function draftHtml(pid){
+  const p = S.projects.get(pid); const d = S.drafts.get(pid); if (!d) return "";
+  const r = d.result||{}; const m = {role:p.role||(r.meta||{}).role, timeline:p.timeline||(r.meta||{}).timeline, scope:p.scope||(r.meta||{}).scope};
+  let out = `<h1>${esc(p.name)}</h1>`;
+  if (p.description) out += `<p><i>${esc(p.description)}</i></p>`;
+  out += `<p><b>Role:</b> ${esc(m.role||"—")}<br><b>Timeline:</b> ${esc(m.timeline||"—")}<br><b>Scope:</b> ${esc(m.scope||"—")}</p>`;
+  for (const s of r.sections||[]){
+    if (!(s.blocks||[]).length) continue;
+    out += `<h2>${esc(s.heading||s.name)}</h2>`;
+    for (const b of s.blocks){
+      if (b.heading) out += `<h3>${esc(b.heading)}</h3>`;
+      out += String(b.text||"").split(/\n+/).filter(Boolean).map(t=>`<p>${esc(t)}</p>`).join("");
+      const c = b.visual && S.captures.get(b.visual);
+      if (c && c.assetId) out += `<p><i>[Screenshot: ${esc(c.title || c.visual || "capture")}]</i></p>`;
+    }
+  }
+  return out;
+}
+function draftMarkdown(pid){
+  const p = S.projects.get(pid); const d = S.drafts.get(pid); if (!d) return "";
+  const r = d.result||{}; const m = {role:p.role||(r.meta||{}).role, timeline:p.timeline||(r.meta||{}).timeline, scope:p.scope||(r.meta||{}).scope};
+  let md = `# ${p.name}\n\n**Role:** ${m.role||"[ADD]"}  \n**Timeline:** ${m.timeline||"[ADD]"}  \n**Scope:** ${m.scope||"[ADD]"}\n\n`;
+  for (const s of r.sections||[]){
+    md += `## ${s.heading||s.name}\n\n`;
+    if (!(s.blocks||[]).length) md += `_[Needs evidence: ${(s.questions||[]).join(" / ")}]_\n\n`;
+    for (const b of s.blocks||[]){
+      if (b.heading) md += `### ${b.heading}\n\n`;
+      md += (d.format==="deck" ? "- " : "") + `${b.text}\n\n`;
+      const c = b.visual && S.captures.get(b.visual);
+      if (c && c.assetId) md += `[Screenshot: ${c.title || c.visual || "capture"}]\n\n`;
+    }
+  }
+  return md;
+}
+
+/* ---------- capture modal ---------- */
+let modal = null;
+function openCapture(defaultPid){
+  const projects = [...S.projects.values()];
+  modal = {blob:null, previewUrl:null, pid: defaultPid || (projects[0] && projects[0].id) || "__new__", listening:false};
+  const opts = projects.map(p=>`<option value="${esc(p.id)}" ${p.id===modal.pid?"selected":""}>${esc(p.name)}</option>`).join("") + `<option value="__new__" ${modal.pid==="__new__"?"selected":""}>+ New project…</option>`;
+  $("#layer").innerHTML = `<div class="scrim" data-act="closeScrim"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="capTitle">
+    <div class="row between"><h2 id="capTitle" style="font-size:22px">New capture</h2><button class="icon-btn" data-act="closeModal" aria-label="Close" style="font-size:22px">×</button></div>
+    <div class="row wrap"><label class="small muted row" style="gap:6px">Project <select id="capProject" class="inp">${opts}</select></label>
+      <input id="capNewProject" class="inp ${modal.pid==="__new__"?"":"hidden"}" placeholder="New project name"></div>
+    <div class="drop" id="drop" tabindex="0" aria-label="Screenshot drop zone">
+      <div id="dropEmpty"><div style="font-weight:600;font-size:15px">Paste a screenshot (⌘V / Ctrl+V)</div>
+      <div class="small muted">or drag an image here, or <label class="link" style="cursor:pointer">upload a file<input type="file" id="capFile" accept="image/*" class="hidden"></label></div>
+      <div class="small muted" style="margin-top:6px">Optional. A note alone still saves.</div></div>
+      <div id="dropFilled" class="hidden" style="width:100%;text-align:center"><img id="capPreview" alt="Screenshot preview"><div><button class="link" data-act="clearImg">Remove image</button></div></div>
+    </div>
+    ${S.assets?"":`<p class="small" style="color:var(--warn);margin:0">Images can't be stored on this page right now. Notes still save.</p>`}
+    <div class="field"><label for="capNote">Quick note</label><textarea id="capNote" class="note" placeholder="A quick description of what this is, or why it matters"></textarea>
+      <div id="dictHint" class="small muted"></div></div>
+    <div class="row between wrap">
+      <div class="row">${S.dictation?`<button class="pill" id="dictBtn" aria-pressed="false">● <span id="dictLbl">Dictate</span></button>`:""}
+        <label class="row small" style="gap:6px"><input type="checkbox" id="capStar"> Key moment</label></div>
+      <button class="btn primary" data-act="saveCapture">Save capture</button>
+    </div></div></div>`;
+  $("#capNote").focus();
+  const drop = $("#drop");
+  drop.addEventListener("dragover", e=>{ e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", ()=>drop.classList.remove("over"));
+  drop.addEventListener("drop", e=>{ e.preventDefault(); drop.classList.remove("over"); const f=[...e.dataTransfer.files].find(f=>f.type.startsWith("image/")); if (f) setModalImage(f); });
+  $("#capFile").addEventListener("change", e=>{ const f=e.target.files[0]; if (f) setModalImage(f); });
+  $("#capProject").addEventListener("change", e=>{ modal.pid=e.target.value; $("#capNewProject").classList.toggle("hidden", modal.pid!=="__new__"); });
+  if (S.dictation) $("#dictBtn").addEventListener("click", toggleDictation);
+}
+function setModalImage(blob){
+  if (!modal) return;
+  if (modal.previewUrl) URL.revokeObjectURL(modal.previewUrl);
+  modal.blob = blob; modal.previewUrl = URL.createObjectURL(blob);
+  $("#capPreview").src = modal.previewUrl;
+  $("#dropEmpty").classList.add("hidden"); $("#dropFilled").classList.remove("hidden");
+}
+function closeModal(){
+  if (modal && modal.listening && S.dictation) S.dictation.stop().catch(()=>{});
+  if (modal && modal.previewUrl) URL.revokeObjectURL(modal.previewUrl);
+  modal = null; pmodal = null; $("#layer").innerHTML = "";
+}
+let dictWired = false;
+function toggleDictation(){
+  const d = S.dictation; if (!d || !modal) return;
+  if (!dictWired){
+    dictWired = true;
+    d.onPartial(({text}) => { const h=$("#dictHint"); if (h) h.textContent = text; });
+    d.onFinal(({text}) => { const t=$("#capNote"); if (t){ t.value = (t.value ? t.value.trimEnd()+" " : "") + text; } const h=$("#dictHint"); if (h) h.textContent=""; });
+    d.onState(({state}) => { if (!modal) return; modal.listening = state==="listening"; const b=$("#dictBtn"); if (b){ b.setAttribute("aria-pressed", String(modal.listening)); $("#dictLbl").textContent = modal.listening?"Listening… tap to stop":"Dictate"; } });
+  }
+  if (modal.listening){ d.stop().catch(()=>{}); return; }
+  d.start().catch(e => { if (e && e.code==="not_granted"){ const b=$("#dictBtn"); if (b) b.remove(); S.dictation=null; } });
+}
+async function saveModal(){
+  if (!modal) return;
+  const note = $("#capNote").value.trim();
+  if (!note && !modal.blob){ toast("Add a note or a screenshot first."); return; }
+  let pid = modal.pid;
+  if (pid==="__new__"){ const n=$("#capNewProject").value.trim(); if (!n){ toast("Name the new project."); return; } pid = await ensureProject(n); }
+  const blob = modal.blob; const starred = $("#capStar").checked;
+  closeModal();
+  let assetId = null;
+  if (blob && S.assets){ try { assetId = (await S.assets.upload(blob)).id; } catch(_) { toast("Couldn't store the image. The note was saved."); } }
+  const id = rid("cap");
+  await put("captures", id, {projectId:pid, note, assetId, url:"", title:"", starred, createdAt:new Date().toISOString(), source:"web", tagStatus:"pending"});
+  if (S.view.name==="home") go("timeline", pid);
+  toast("Saved. Claude is tagging it…");
+  tagCapture(id, blob && assetId ? blob : null);
+}
+
+/* ---------- popovers ---------- */
+function showSource(id, anchor){
+  const c = S.captures.get(id); if (!c) return;
+  closePop();
+  const r = anchor.getBoundingClientRect();
+  const el = document.createElement("div"); el.className="pop"; el.id="pop"; el.setAttribute("role","dialog");
+  el.innerHTML = `${c.assetId?`<img src="${imgUrl(c.assetId)}" alt="">`:`<div class="noteonly-tag">Note only</div>`}
+    ${c.title?`<b>${esc(c.title)}</b>`:""}<div style="white-space:pre-wrap">${esc(c.note||"")}</div>
+    <div class="small muted">${esc(c.phase||"")} · ${esc(c.type||"")} · ${esc(fmtDate(c.createdAt))}</div>`;
+  document.body.appendChild(el);
+  const top = Math.min(window.innerHeight - el.offsetHeight - 10, r.bottom + 6);
+  el.style.top = Math.max(10, top) + "px";
+  el.style.left = Math.max(10, Math.min(window.innerWidth - 310, r.left)) + "px";
+}
+function closePop(){ const p=$("#pop"); if (p) p.remove(); }
+
+/* ---------- events ---------- */
+document.addEventListener("click", async (e) => {
+  const t = e.target.closest("[data-act]");
+  if (!t){ closePop(); return; }
+  const a = t.dataset.act;
+  if (a!=="src") closePop();
+  if (a==="closeScrim" && e.target!==t) return;
+  switch(a){
+    case "nav": go(t.dataset.view, t.dataset.pid); break;
+    case "home": go("home"); break;
+    case "capture": openCapture(); break;
+    case "captureHere": openCapture(S.view.projectId); break;
+    case "example": loadExample(); break;
+    case "newProject": openProjectModal(); break;
+    case "editProject": openProjectModal(t.dataset.pid); break;
+    case "captureFor": openCapture(t.dataset.pid); break;
+    case "pDelete": $("#pDelWrap").innerHTML = `<span class="confirm">Delete this project and all its captures? <button type="button" class="link" style="color:var(--warn)" data-act="pDeleteYes">Delete</button><button type="button" class="link" data-act="closeModal">Cancel</button></span>`; break;
+    case "pDeleteYes": { const id = pmodal && pmodal.pid; closeModal(); if (id) deleteProject(id); break; }
+    case "closeModal": case "closeScrim": closeModal(); break;
+    case "clearImg": if (modal){ modal.blob=null; $("#dropEmpty").classList.remove("hidden"); $("#dropFilled").classList.add("hidden"); } break;
+    case "saveCapture": saveModal(); break;
+    case "filter": S.filter=t.dataset.f; render(); break;
+    case "dismiss": S.banner=null; render(); break;
+    case "star": { const c=S.captures.get(t.dataset.id); if (c) patch("captures", c.id, {starred:!c.starred}); break; }
+    case "del": S.confirmDel=t.dataset.id; render(); break;
+    case "delNo": S.confirmDel=null; render(); break;
+    case "delYes": S.confirmDel=null; remove("captures", t.dataset.id); break;
+    case "retag": tagMany([t.dataset.id]); break;
+    case "retagAll": tagMany(projCaptures(S.view.projectId).filter(c=>!c.phase||!c.type).map(c=>c.id)); break;
+    case "zoom": { const lb=document.createElement("div"); lb.className="lightbox"; lb.innerHTML=`<img src="${esc(t.dataset.src)}" alt="">`; lb.addEventListener("click",()=>lb.remove()); document.body.appendChild(lb); break; }
+    case "fmt": S.view.format=t.dataset.f; render(); break;
+    case "generate": generate(); break;
+    case "stop": if (S.gen) S.gen.ctl.abort(); break;
+    case "jump": e.preventDefault(); { const s=document.getElementById("sec-"+t.dataset.i); if (s) s.scrollIntoView({behavior:"smooth"}); } break;
+    case "src": e.stopPropagation(); showSource(t.dataset.id, t); break;
+    case "answer": {
+      const inp = document.getElementById(t.dataset.input); const v = inp && inp.value.trim(); if (!v){ toast("Type an answer first."); return; }
+      const id = rid("ans");
+      await put("captures", id, {projectId:S.view.projectId, note:"Q: "+t.dataset.q+"\nA: "+v, assetId:null, url:"", title:"", starred:false,
+        createdAt:new Date().toISOString(), source:"gap-answer", tagStatus:"done", phase:PHASES.includes(t.dataset.phase)?t.dataset.phase:"Develop", type:"Note", visual:""});
+      toast("Saved as a capture. Regenerate to include it.");
+      break;
+    }
+    case "copyHtml": {
+      const html = draftHtml(S.view.projectId);
+      const plain = draftMarkdown(S.view.projectId);
+      try {
+        await navigator.clipboard.write([new ClipboardItem({"text/html": new Blob([html],{type:"text/html"}), "text/plain": new Blob([plain],{type:"text/plain"})})]);
+        toast("Copied. Paste it into your portfolio site's text editor, then drop in the screenshots.");
+      } catch(_) {
+        try { await navigator.clipboard.writeText(plain); toast("Copied as plain text."); } catch(__) { toast("Your browser blocked copying. Use Copy as Markdown."); }
+      }
+      break;
+    }
+    case "copyMd": {
+      const md = draftMarkdown(S.view.projectId);
+      try { await navigator.clipboard.writeText(md); toast("Copied as Markdown."); }
+      catch(_) {
+        $("#layer").innerHTML = `<div class="scrim" data-act="closeScrim"><div class="modal" role="dialog" aria-modal="true"><div class="row between"><h2>Copy your draft</h2><button class="icon-btn" data-act="closeModal" aria-label="Close">×</button></div><p class="small muted">Your browser blocked automatic copying. Select all and copy.</p><textarea class="note" style="min-height:320px" readonly>${esc(md)}</textarea></div></div>`;
+        const ta=$("#layer textarea"); ta.focus(); ta.select();
+      }
+      break;
+    }
+  }
+});
+document.addEventListener("change", (e) => {
+  const t = e.target;
+  if (t.dataset.act==="setPhase") patch("captures", t.dataset.id, {phase:t.value});
+  if (t.dataset.act==="setType") patch("captures", t.dataset.id, {type:t.value});
+  if (t.dataset.act==="addVisual" && t.files[0]){
+    const id=t.dataset.id, f=t.files[0];
+    if (!S.assets){ toast("Images can't be stored on this page right now."); return; }
+    S.assets.upload(f).then(up => patch("captures", id, {assetId:up.id})).then(()=>toast("Visual added.")).catch(()=>toast("Couldn't store the image."));
+  }
+});
+document.addEventListener("paste", (e) => {
+  if (!modal) return;
+  const item = [...(e.clipboardData && e.clipboardData.items || [])].find(i=>i.type.startsWith("image/"));
+  if (item){ e.preventDefault(); setModalImage(item.getAsFile()); }
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key==="Escape"){ if ($(".lightbox")) $(".lightbox").remove(); else if (modal) closeModal(); else closePop(); }
+  if (e.key==="Enter" && (e.metaKey||e.ctrlKey) && modal){ e.preventDefault(); saveModal(); }
+});
+$("#brand").addEventListener("click", () => go("home"));
+
+/* ---------- start ---------- */
+render();
+(async () => {
+  const c = window.claude;
+  if (!c || !c.use){ S.storageNote = "Open this page on claude.ai to save captures and use Claude. Changes here won't be kept."; render(); return; }
+  const [db, assets, sample, dictation] = await Promise.all([c.use("db"), c.use("assets"), c.use("sample"), c.use("dictation")]);
+  S.db = db; S.assets = assets; S.sample = sample; S.dictation = dictation;
+  if (sample){ try { const lim = await sample.limits(); S.imgOK = !!(lim && lim.images); } catch(_) {} }
+  if (db) subscribe();
+  else S.storageNote = "Storage isn't available (are you signed in?). Changes here won't be kept.";
+  render();
+})();
+})();
+</script>
+</body>
+</html>
